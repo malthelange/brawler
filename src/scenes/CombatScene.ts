@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { createUnit } from '@/game/core/Unit';
-import { unitData } from '@/game/core/unitData';
+import { createPlayer } from '@/game/core/Player';
+import { createSimpleWarriorBoard, createSimpleKnightBoard } from '@/game/core/boardCompositions';
 import { BattleOrchestrator } from '@/game/flow/BattleOrchestrator';
 
 export class CombatScene extends Phaser.Scene {
@@ -9,18 +9,12 @@ export class CombatScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Calculate dynamic positions based on camera size
-    const camera = this.cameras.main;
-    const centerX = camera.width / 2;
-    const topY = camera.height * 0.25;
-    const bottomY = camera.height * 0.75;
-
-    // Create two units for battle
-    const warrior = createUnit(unitData['warrior']!, centerX, topY);
-    const knight = createUnit(unitData['knight']!, centerX, bottomY);
+    // Create two players with board compositions
+    const player1 = createPlayer('player1', 'Player 1', createSimpleWarriorBoard());
+    const player2 = createPlayer('player2', 'Player 2', createSimpleKnightBoard());
 
     // Start battle using flow orchestrator
     const orchestrator = new BattleOrchestrator(this);
-    orchestrator.startBattle(warrior, knight);
+    orchestrator.startBattle(player1, player2);
   }
 }

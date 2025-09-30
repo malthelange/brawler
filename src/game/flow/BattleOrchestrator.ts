@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Unit } from '@/game/core/Unit';
+import { Player } from '@/game/core/Player';
 import { BattleController } from '@/game/core/BattleController';
 import { BattlePresenter } from '@/game/presentation/BattlePresenter';
 
@@ -16,11 +16,11 @@ export class BattleOrchestrator {
   }
 
   /**
-   * Start and present a battle between two units
+   * Start and present a battle between two players
    */
-  public async startBattle(unit1: Unit, unit2: Unit): Promise<void> {
+  public async startBattle(player1: Player, player2: Player): Promise<void> {
     // Step 1: Evaluate battle using core logic
-    const battleResult = BattleController.evaluate(unit1, unit2);
+    const battleResult = BattleController.evaluate(player1, player2);
 
     // Step 2: Present battle using presentation layer
     const presenter = new BattlePresenter(this.scene);

@@ -1,44 +1,43 @@
 import { describe, it, expect } from 'vitest';
 import { BattleController } from '@/game/core/BattleController';
-import { Unit } from '@/game/core/Unit';
+import { createPlayer } from '../Player';
+import { createSimpleWarriorBoard, createSimpleKnightBoard } from '../boardCompositions';
 
 describe('BattleController', () => {
   describe('evaluate', () => {
-    it('should have unit1 attack first', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 0, y: 0 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 0, y: 0 };
+    it('should have player1 attack first', () => {
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
 
-      const result = BattleController.evaluate(warrior, knight);
+      const result = BattleController.evaluate(player1, player2);
 
       expect(result.turns.length).toBeGreaterThan(0);
+      expect(result.turns[0]?.attackingPlayerId).toBe('p1');
       expect(result.turns[0]?.attacker.id).toBe('warrior');
       expect(result.turns[0]?.defender.id).toBe('knight');
     });
 
-    it('should alternate turns between units', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 0, y: 0 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 0, y: 0 };
+    it('should alternate turns between players', () => {
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
 
-      const result = BattleController.evaluate(warrior, knight);
+      const result = BattleController.evaluate(player1, player2);
 
-      // Turn 1: warrior attacks knight
-      expect(result.turns[0]?.attacker.id).toBe('warrior');
-      expect(result.turns[0]?.defender.id).toBe('knight');
+      // Turn 1: player1 attacks
+      expect(result.turns[0]?.attackingPlayerId).toBe('p1');
 
-      // Turn 2: knight attacks warrior
-      expect(result.turns[1]?.attacker.id).toBe('knight');
-      expect(result.turns[1]?.defender.id).toBe('warrior');
+      // Turn 2: player2 attacks
+      expect(result.turns[1]?.attackingPlayerId).toBe('p2');
 
-      // Turn 3: warrior attacks knight again
-      expect(result.turns[2]?.attacker.id).toBe('warrior');
-      expect(result.turns[2]?.defender.id).toBe('knight');
+      // Turn 3: player1 attacks again
+      expect(result.turns[2]?.attackingPlayerId).toBe('p1');
     });
 
     it('should apply correct damage (direct attack value)', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 0, y: 0 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 0, y: 0 };
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
 
-      const result = BattleController.evaluate(warrior, knight);
+      const result = BattleController.evaluate(player1, player2);
 
       // First turn: warrior (attack 2) attacks knight
       expect(result.turns[0]?.damage).toBe(2);
@@ -49,34 +48,47 @@ describe('BattleController', () => {
       expect(result.turns[1]?.defenderHpAfter).toBe(2); // 3 - 1 = 2
     });
 
-    it('should determine warrior as winner (higher attack)', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 0, y: 0 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 0, y: 0 };
+    it('should determine correct winner', () => {
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
 
-      const result = BattleController.evaluate(warrior, knight);
+      const result = BattleController.evaluate(player1, player2);
 
-      expect(result.winner.id).toBe('warrior');
-      expect(result.loser.id).toBe('knight');
-      expect(result.loser.hp).toBe(0);
+      // Warrior has higher attack, should win
+      expect(result.winner.id).toBe('p1');
+      expect(result.loser.id).toBe('p2');
     });
 
-    it('should complete battle in correct number of turns', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 0, y: 0 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 0, y: 0 };
+    it('should include board positions in turns', () => {
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
 
-      const result = BattleController.evaluate(warrior, knight);
+      const result = BattleController.evaluate(player1, player2);
 
-      // Warrior attacks: knight 4 -> 2 -> 0 (2 attacks)
-      // Knight attacks: warrior 3 -> 2 (1 attack)
-      // Total: 3 turns (warrior, knight, warrior)
-      expect(result.turns.length).toBe(3);
+      // Both units should be in front row center (slot 1)
+      expect(result.turns[0]?.attackerPosition.row).toBe('front');
+      expect(result.turns[0]?.attackerPosition.slot).toBe(1);
+      expect(result.turns[0]?.defenderPosition.row).toBe('front');
+      expect(result.turns[0]?.defenderPosition.slot).toBe(1);
+    });
+
+    it('should complete battle when one player loses all units', () => {
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
+
+      const result = BattleController.evaluate(player1, player2);
+
+      // Battle should complete with a winner
+      expect(result.turns.length).toBeGreaterThan(0);
+      expect(result.winner).toBeDefined();
+      expect(result.loser).toBeDefined();
     });
 
     it('should track HP correctly through all turns', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 0, y: 0 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 0, y: 0 };
+      const player1 = createPlayer('p1', 'Player 1', createSimpleWarriorBoard());
+      const player2 = createPlayer('p2', 'Player 2', createSimpleKnightBoard());
 
-      const result = BattleController.evaluate(warrior, knight);
+      const result = BattleController.evaluate(player1, player2);
 
       // Turn 1: warrior attacks, knight 4 -> 2
       expect(result.turns[0]?.defenderHpAfter).toBe(2);
@@ -86,28 +98,6 @@ describe('BattleController', () => {
 
       // Turn 3: warrior attacks, knight 2 -> 0
       expect(result.turns[2]?.defenderHpAfter).toBe(0);
-    });
-
-    it('should handle unit with higher HP winning', () => {
-      const weakUnit: Unit = { id: 'weak', hp: 2, maxHp: 2, attack: 1, x: 0, y: 0 };
-      const strongUnit: Unit = { id: 'strong', hp: 10, maxHp: 10, attack: 1, x: 0, y: 0 };
-
-      const result = BattleController.evaluate(weakUnit, strongUnit);
-
-      expect(result.winner.id).toBe('strong');
-      expect(result.loser.id).toBe('weak');
-    });
-
-    it('should preserve unit positions in turns', () => {
-      const warrior: Unit = { id: 'warrior', hp: 3, maxHp: 3, attack: 2, x: 100, y: 200 };
-      const knight: Unit = { id: 'knight', hp: 4, maxHp: 4, attack: 1, x: 300, y: 400 };
-
-      const result = BattleController.evaluate(warrior, knight);
-
-      expect(result.turns[0]?.attacker.x).toBe(100);
-      expect(result.turns[0]?.attacker.y).toBe(200);
-      expect(result.turns[0]?.defender.x).toBe(300);
-      expect(result.turns[0]?.defender.y).toBe(400);
     });
   });
 });

@@ -28,8 +28,12 @@ src/
 │   ├── core/                  # Game logic & state (pure functions)
 │   │   ├── Unit.ts            # Unit entity & logic
 │   │   ├── unitData.ts        # Unit data
+│   │   ├── BoardPosition.ts   # Board position types
+│   │   ├── Board.ts           # Board entity & functions
+│   │   ├── Player.ts          # Player entity & functions
+│   │   ├── boardCompositions.ts # Predefined board setups
 │   │   ├── BattleController.ts # Combat logic
-│   │   └── __tests__/         # Unit tests
+│   │   └── __tests__/         # Unit tests (29 tests)
 │   ├── presentation/          # Rendering & visuals
 │   │   └── BattlePresenter.ts # Battle animations & display
 │   └── flow/                  # Orchestration & game flow
@@ -42,11 +46,12 @@ The codebase follows a three-layer architecture:
 
 ### Core Layer (`game/core/`)
 Pure game logic and state management. Contains:
-- Entity definitions (Unit)
-- Game data (unitData)
+- Entity definitions (Unit, Board, Player, BoardPosition)
+- Game data (unitData, boardCompositions)
 - Combat logic (BattleController)
 - All business rules
-- Unit tests
+- Pure functions for board manipulation
+- Comprehensive unit tests (29 tests covering all entities)
 
 **Principles:** Pure functions, no side effects, fully testable
 
@@ -71,49 +76,76 @@ Orchestrates game flow and coordinates between layers. Contains:
 ## Current Status
 
 ✅ Project setup complete
+✅ Three-layer architecture (Core/Presentation/Flow)
+✅ **Player & Board system implemented**
 ✅ Unit types and data defined
-✅ BattleController - Pure combat logic (all tests passing)
-✅ BattlePresenter - Animated rendering system
-✅ Complete battle system working (top/bottom layout)
-✅ Vitest testing framework integrated
+✅ BattleController - Board-based combat logic
+✅ BattlePresenter - Animated rendering system (basic)
+✅ Complete battle system working
+✅ Vitest testing framework - 29 tests passing
 ✅ Dynamic resolution with aspect ratio maintained (16:9)
 
-## Week 1 Goal - Minimal Viable Combat
+## Game Concepts
 
-### Requirements
+### Players
+Each player has:
+- Unique ID
+- Name
+- Board with units
 
-1. **Two units on screen** with health bars (simple colored rectangles)
-2. **Turn-based combat**: Alternating turns
-3. **Damage formula**: Direct damage equal to attacker's attack stat
-4. **Visual feedback**: Damage numbers, health bar updates
-5. **Victory detection**: When one unit reaches 0 HP
+### Boards
+Board layout: **5 positions**
+- **Front Row**: 3 slots (positions 0, 1, 2)
+- **Back Row**: 2 slots (positions 0, 1)
 
-### Unit Entity Structure
+Each slot can be:
+- Empty
+- Occupied by a unit
 
-```typescript
-{
-  id: string,
-  hp: number,
-  maxHp: number,
-  attack: number,
-  x: number,
-  y: number
-}
-```
+### Combat Rules
+1. **Turn Order**: Players alternate turns
+2. **Targeting**: Front row must be targeted first
+   - Back row can only be targeted when front row is empty
+3. **Attacking**: First alive unit from attacking player's board attacks
+4. **Damage**: Direct damage (attacker's attack value)
+5. **Victory**: Player wins when opponent has no alive units
 
-### Test Units
+### Unit Stats
+- **HP**: Health points (current/max)
+- **Attack**: Damage dealt per attack
 
-- **Warrior**: HP 3, Attack 2
-- **Knight**: HP 4, Attack 1
+**Example Units:**
+- Warrior: 3 HP, 2 Attack
+- Knight: 4 HP, 1 Attack
 
-## Next Steps
+## Development Roadmap
 
-1. Define Unit type and interface
-2. Create unit data file (JSON/TS)
-3. Implement unit rendering system (colored rectangles + health bars)
-4. Build combat system (turn order, damage calculation)
-5. Add visual feedback (damage numbers, animations)
-6. Implement victory detection
+### ✅ Completed - Core Battle System
+1. Unit type and interface ✓
+2. Player & Board system ✓
+3. Combat logic (BattleController) ✓
+4. Turn-based combat with board positioning ✓
+5. Basic visual feedback ✓
+6. Victory detection ✓
+7. Comprehensive test coverage (29 tests) ✓
+
+### 🎯 Next Steps - Enhanced Visualization
+1. **Update BattlePresenter to render full boards**
+   - Display all 5 positions per player
+   - Show empty slots as outlined rectangles
+   - Position units correctly on the board
+   - Visualize front row vs back row
+
+2. **Improve board compositions**
+   - Add more variety (different unit placements)
+   - Create balanced team compositions
+   - Add more unit types
+
+3. **Enhanced animations**
+   - Attack animations (unit movement/flash)
+   - Better damage visualization
+   - Death animations
+   - Turn indicators
 
 ## Future Features (Post Week 1)
 
