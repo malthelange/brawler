@@ -1,4 +1,4 @@
-import { Unit, takeDamage, isAlive } from '@/game/entities/Unit';
+import { Unit, takeDamage, isAlive } from '@/game/core/Unit';
 
 /**
  * Represents a single turn in combat

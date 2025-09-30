@@ -23,16 +23,60 @@ src/
 ├── config/
 │   └── gameConfig.ts          # Phaser configuration (1920x1080)
 ├── scenes/
-│   └── CombatScene.ts         # Main combat scene
+│   └── CombatScene.ts         # Scene definitions
 ├── game/
-│   ├── entities/              # Unit entities and types
-│   └── systems/               # Combat logic systems
+│   ├── core/                  # Game logic & state (pure functions)
+│   │   ├── Unit.ts            # Unit entity & logic
+│   │   ├── unitData.ts        # Unit data
+│   │   ├── BattleController.ts # Combat logic
+│   │   └── __tests__/         # Unit tests
+│   ├── presentation/          # Rendering & visuals
+│   │   └── BattlePresenter.ts # Battle animations & display
+│   └── flow/                  # Orchestration & game flow
+│       └── BattleOrchestrator.ts # Battle lifecycle coordination
 ```
+
+## Architecture
+
+The codebase follows a three-layer architecture:
+
+### Core Layer (`game/core/`)
+Pure game logic and state management. Contains:
+- Entity definitions (Unit)
+- Game data (unitData)
+- Combat logic (BattleController)
+- All business rules
+- Unit tests
+
+**Principles:** Pure functions, no side effects, fully testable
+
+### Presentation Layer (`game/presentation/`)
+Visual rendering and animations. Contains:
+- BattlePresenter for battle visualization
+- Phaser-specific rendering code
+- Animation logic
+- UI components
+
+**Principles:** No business logic, only visual concerns
+
+### Flow Layer (`game/flow/`)
+Orchestrates game flow and coordinates between layers. Contains:
+- BattleOrchestrator for battle coordination
+- Scene transitions
+- Player action handling
+- Layer coordination
+
+**Principles:** Thin coordination layer, delegates to core and presentation
 
 ## Current Status
 
 ✅ Project setup complete
-✅ CombatScene displaying "Hello Combat"
+✅ Unit types and data defined
+✅ BattleController - Pure combat logic (all tests passing)
+✅ BattlePresenter - Animated rendering system
+✅ Complete battle system working (top/bottom layout)
+✅ Vitest testing framework integrated
+✅ Dynamic resolution with aspect ratio maintained (16:9)
 
 ## Week 1 Goal - Minimal Viable Combat
 
@@ -85,7 +129,22 @@ src/
 npm run dev      # Start dev server (localhost:3000)
 npm run build    # Production build
 npm run preview  # Preview production build
+npm test         # Run tests in watch mode
+npm test -- --run # Run tests once
 ```
+
+## Technical Notes
+
+### Dynamic Resolution
+- Base resolution: 1920x1080 (16:9 aspect ratio)
+- Scale mode: FIT (maintains aspect ratio)
+- All positions calculated dynamically from camera dimensions
+- Units positioned at 25% (top) and 75% (bottom) of screen height
+
+### Testing
+- Vitest framework for unit tests
+- BattleController has 8 passing tests
+- Tests cover: turn order, damage calculation, victory detection, HP tracking
 
 ## Notes
 

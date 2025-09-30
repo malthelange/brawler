@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { Unit } from '@/game/entities/Unit';
-import { BattleResult, BattleTurn } from './BattleController';
+import { Unit } from '@/game/core/Unit';
+import { BattleResult, BattleTurn } from '@/game/core/BattleController';
 
 /**
  * BattlePresenter - Handles all visual rendering and animation
@@ -41,11 +41,12 @@ export class BattlePresenter {
   }
 
   /**
-   * Render unit 1 (left side, blue)
+   * Render unit 1 (top, blue)
    */
   private renderUnit1(unit: Unit): void {
-    const x = 400;
-    const y = 540;
+    const camera = this.scene.cameras.main;
+    const x = camera.width / 2;
+    const y = camera.height * 0.25;
     const width = 120;
     const height = 120;
     const color = 0x4a90e2; // Blue
@@ -74,11 +75,12 @@ export class BattlePresenter {
   }
 
   /**
-   * Render unit 2 (right side, red)
+   * Render unit 2 (bottom, red)
    */
   private renderUnit2(unit: Unit): void {
-    const x = 1520;
-    const y = 540;
+    const camera = this.scene.cameras.main;
+    const x = camera.width / 2;
+    const y = camera.height * 0.75;
     const width = 120;
     const height = 120;
     const color = 0xe74c3c; // Red

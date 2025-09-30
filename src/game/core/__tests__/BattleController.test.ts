@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { BattleController } from '../BattleController';
-import { Unit } from '@/game/entities/Unit';
+import { BattleController } from '@/game/core/BattleController';
+import { Unit } from '@/game/core/Unit';
 
 describe('BattleController', () => {
   describe('evaluate', () => {
