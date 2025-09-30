@@ -39,8 +39,8 @@ src/
 ### Requirements
 
 1. **Two units on screen** with health bars (simple colored rectangles)
-2. **Turn-based combat**: Faster unit attacks first
-3. **Damage formula**: `max(0, attacker.attack - defender.defense)`
+2. **Turn-based combat**: Alternating turns
+3. **Damage formula**: Direct damage equal to attacker's attack stat
 4. **Visual feedback**: Damage numbers, health bar updates
 5. **Victory detection**: When one unit reaches 0 HP
 
@@ -52,12 +52,15 @@ src/
   hp: number,
   maxHp: number,
   attack: number,
-  defense: number,
-  speed: number,
   x: number,
   y: number
 }
 ```
+
+### Test Units
+
+- **Warrior**: HP 3, Attack 2
+- **Knight**: HP 4, Attack 1
 
 ## Next Steps
 
